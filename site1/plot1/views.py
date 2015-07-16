@@ -44,6 +44,10 @@ def ex2(request):
 
 def ex3(request):
     p = views_util.plot3()
-
     script, div = components(p, CDN)
     return render(request, "plot1/ex3.html", {"bokeh_script":script, "bokeh_div":div})
+
+def ex4(request):
+    p = views_util.plot4()
+    script, div = components(p, CDN)
+    return render(request, "plot1/ex4.html", {"bokeh_script":script, "bokeh_div":div})

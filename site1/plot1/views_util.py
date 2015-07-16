@@ -7,9 +7,22 @@ from collections import OrderedDict
 from bokeh.plotting import figure
 from bokeh.models import DatetimeTickFormatter
 import math
-
+import numpy as np
 from django.conf import settings
 import os
+from bokeh.models.mappers import LinearColorMapper
+
+def _covert_matplotlib_palette_to_bokeh(name="rainbow"):
+    '''
+    See names here:
+    http://matplotlib.org/examples/color/colormaps_reference.html
+    '''
+    import matplotlib as plt
+    import matplotlib.cm as cm
+    import numpy as np
+    colormap =cm.get_cmap(name) #choose any matplotlib colormap here
+    bokehpalette = [plt.colors.rgb2hex(m) for m in colormap(np.arange(colormap.N))]
+    return LinearColorMapper(bokehpalette)
 
 def plot3():
     df = pd.read_csv(os.path.join(settings.BASE_DIR,'data/Land_Ocean_Monthly_Anomaly_Average.csv'))
@@ -55,3 +68,21 @@ def plot3():
     t.toolbar_location=None
 
     return t
+
+def plot4():
+    from bokeh.models import HoverTool, BoxSelectTool
+    TOOLS = "crosshair,pan,wheel_zoom,box_zoom,reset,hover,previewsave"
+    x = np.arange(-5, 5, 0.1)
+    y = np.arange(-5, 5, 0.1)
+    xx, yy = np.meshgrid(x, y, sparse=True)
+    z = np.sin(xx**2 + yy**2) / (xx**2 + yy**2)
+
+    p = figure(x_range=[-5, 5], y_range=[-5, 5])
+    p.image(image=[z], x=[-5], y=[-5], dw=[10], dh=[10],
+            dilate=True, tools=TOOLS,
+            color_mapper=_covert_matplotlib_palette_to_bokeh())
+
+    p.yaxis.axis_label = 'Label for Y'
+    p.xaxis.axis_label = 'Label for X'
+    p.title = 'Dummy 2D plot!'
+    return p
