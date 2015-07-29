@@ -47,3 +47,16 @@ def ex3(request):
 
     script, div = components(p, CDN)
     return render(request, "plot1/ex3.html", {"bokeh_script":script, "bokeh_div":div})
+
+
+def ex4(request):
+    p = views_util.plot4()
+
+    script, div = components(p, CDN)
+    return render(request, "plot1/ex4.html", {"bokeh_script":script, "bokeh_div":div})
+
+def ex5(request):
+    p = views_util.plot5()
+
+    script, div = components(p, CDN)
+    return render(request, "plot1/ex5.html", {"bokeh_script":script, "bokeh_div":div})
