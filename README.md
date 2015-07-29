@@ -2,6 +2,10 @@
 
 Dummy sample of a plot rendered by Bokeh in Django
 
+# Django Architecture
+
+![Django architecture and the Model View Controller.](https://eggslaking.files.wordpress.com/2013/03/django2.png?w=580)
+
 # To start the project
 
 ```
