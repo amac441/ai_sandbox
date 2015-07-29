@@ -5,7 +5,7 @@
 import matplotlib as plt
 import matplotlib.cm as cm
 import pandas as pd
-from bokeh.models import ColumnDataSource, HoverTool
+from bokeh.models import ColumnDataSource, HoverTool, Callback
 from collections import OrderedDict
 from bokeh.plotting import figure
 from bokeh.models import DatetimeTickFormatter
@@ -14,7 +14,10 @@ import numpy as np
 from django.conf import settings
 import os
 from bokeh import palettes
-
+from bokeh.models.widgets import Dropdown
+from bokeh.io import vform
+import ast
+import json
 
 def get_color_map_from_matplotlib(name):
     '''
@@ -99,24 +102,25 @@ def plot4():
 
 
 def plot5():
-
+    all_color_maps = sorted( m for m in plt.cm.datad if not m.endswith("_r"))
     TOOLS = "resize,crosshair,pan,wheel_zoom,box_zoom,reset,tap,previewsave,box_select,poly_select,lasso_select,hover"
     x, y = np.mgrid[-50:50, -50:50]
     dist = np.hypot(x, y)  # Linear distance from point 0, 0
     z = np.cos(dist / (2 * np.pi))
 
-    cm = get_color_map_from_matplotlib('rainbow')
-    
-    # get colors form 0 to 255
-    colors = np.rint((len(cm)-1) * ((z.flatten() +1)/2))
-    
+    def get_colors(name = 'rainbow'):
+        cm = get_color_map_from_matplotlib(name)
+        # get colors form 0 to 255
+        colors = np.rint((len(cm)-1) * ((z.flatten() +1)/2))
+        return [ cm[i] for i in colors.astype(int)]
+        
     source = ColumnDataSource(
         data=dict(
             x = x.flatten(),
             y = y.flatten(),
             z = z.flatten(),
             # get color values from index 0..255
-            colors = [ cm[i] for i in colors.astype(int)],
+            colors = get_colors(),
         )
     )
     
@@ -133,6 +137,23 @@ def plot5():
         ('value', 'z=@z'),
     ])
     
-
-
-    return p
+    # Dropdown
+    # function(source,cb_obj,cb_data)
+    callback = Callback(args=dict(source=source), code="""
+        var cmaps = %s;
+        var data = source.get('data');
+        console.log(cb_data)
+        console.log(cb_obj)
+        var cm_chosen = cb_obj.get('action');
+        console.log(cm_chosen);
+        
+        data['colors'] = cmaps[cm_chosen];
+        source.trigger('change');
+    """%( ast.literal_eval(json.dumps( { c: get_colors(c)  for c in all_color_maps } ))) )
+    
+    menu = [(c,c) for c in all_color_maps]
+    dropdown = Dropdown(label="Change colormap", type="success", 
+                        default_action='rainbow', menu=menu, callback=callback)   
+    
+    layout = vform(dropdown, p)
+    return layout
