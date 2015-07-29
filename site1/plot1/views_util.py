@@ -82,7 +82,7 @@ def plot3():
 
 
 def plot4():
-    TOOLS = "resize,crosshair,pan,wheel_zoom,box_zoom,reset,tap,previewsave,box_select,poly_select,lasso_select"
+    TOOLS = "resize,crosshair,pan,wheel_zoom,box_zoom,reset,tap,previewsave,box_select,poly_select,lasso_select,hover"
     x, y = np.mgrid[-50:50, -50:50]
     dist = np.hypot(x, y)  # Linear distance from point 0, 0
     z = np.cos(dist / (2 * np.pi))
@@ -90,30 +90,49 @@ def plot4():
     p = figure(x_range=[-50, 50], y_range=[-50, 50], tools=TOOLS)
 
     cm = get_color_map_from_matplotlib('autumn')
-    p.image(image=[z], x=np.linspace(-50, 50, 100), 
-            y=np.linspace(-50, 50, 100), 
-            dw=[100], dh=[100], 
-            #palette=palettes.Spectral11)
+    p.image(image=[z], x=np.linspace(-50, 50, 100),
+            y=np.linspace(-50, 50, 100),
+            dw=[100], dh=[100],
+            # palette=palettes.Spectral11)
             palette=cm)
     return p
 
 
 def plot5():
 
-    from six.moves import zip
+    TOOLS = "resize,crosshair,pan,wheel_zoom,box_zoom,reset,tap,previewsave,box_select,poly_select,lasso_select,hover"
+    x, y = np.mgrid[-50:50, -50:50]
+    dist = np.hypot(x, y)  # Linear distance from point 0, 0
+    z = np.cos(dist / (2 * np.pi))
 
-    N = 4000
-
-    x = np.random.random(size=N) * 100
-    y = np.random.random(size=N) * 100
-    radii = np.random.random(size=N) * 1.5
-    colors = ["#%02x%02x%02x" % (r, g, 150) for r, g in zip(
-        np.floor(50 + 2 * x), np.floor(30 + 2 * y))]
-
-    TOOLS = "resize,crosshair,pan,wheel_zoom,box_zoom,reset,tap,previewsave,box_select,poly_select,lasso_select"
-
+    cm = get_color_map_from_matplotlib('rainbow')
+    
+    # get colors form 0 to 255
+    colors = np.rint((len(cm)-1) * ((z.flatten() +1)/2))
+    
+    source = ColumnDataSource(
+        data=dict(
+            x = x.flatten(),
+            y = y.flatten(),
+            z = z.flatten(),
+            # get color values from index 0..255
+            colors = [ cm[i] for i in colors.astype(int)],
+        )
+    )
+    
+    
     p = figure(tools=TOOLS)
-    p.scatter(x, y, radius=radii, fill_color=colors,
-              fill_alpha=0.6, line_color=None)
+    
+    p.rect('x', 'y', 1, 1, source=source, color='colors', line_color=None)
+    
+    
+    hover = p.select(dict(type=HoverTool))
+    
+    hover.tooltips = OrderedDict([
+        ('coords', 'x=@x, y=@y'),
+        ('value', 'z=@z'),
+    ])
+    
+
 
     return p
