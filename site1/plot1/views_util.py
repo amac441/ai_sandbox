@@ -5,7 +5,8 @@
 import matplotlib as plt
 import matplotlib.cm as cm
 import pandas as pd
-from bokeh.models import ColumnDataSource, HoverTool, Callback
+from bokeh.models import ColumnDataSource, HoverTool
+from bokeh.models import CustomJS
 from collections import OrderedDict
 from bokeh.plotting import figure
 from bokeh.models import DatetimeTickFormatter
@@ -113,7 +114,7 @@ def plot5():
         # get colors form 0 to 255
         colors = np.rint((len(cm)-1) * ((z.flatten() +1)/2))
         return [ cm[i] for i in colors.astype(int)]
-        
+
     source = ColumnDataSource(
         data=dict(
             x = x.flatten(),
@@ -123,37 +124,43 @@ def plot5():
             colors = get_colors(),
         )
     )
-    
-    
-    p = figure(tools=TOOLS)
-    
+
+
+    p = figure(tools=TOOLS,plot_width=800, plot_height=800)
+
     p.rect('x', 'y', 1, 1, source=source, color='colors', line_color=None)
-    
-    
+
+
     hover = p.select(dict(type=HoverTool))
-    
-    hover.tooltips = OrderedDict([
-        ('coords', 'x=@x, y=@y'),
-        ('value', 'z=@z'),
-    ])
-    
+
+    hover.tooltips ="""
+        <div>
+            <span style="font-size: 17px; font-weight: bold;">@z</span>
+            <span style="font-size: 15px; color: #966;">[$index]</span>
+        </div>
+        <div>
+            <span style="font-size: 15px;">(@x, @y)</span>
+            <span style="font-size: 10px; color: #696;">($x, $y)</span>
+        </div>
+        """
+    #  OrderedDict([
+    #     ('coords', 'x=@x, y=@y'),
+    #     ('value', 'z=@z'),
+    # ])
+
     # Dropdown
     # function(source,cb_obj,cb_data)
-    callback = Callback(args=dict(source=source), code="""
+    callback = CustomJS(args=dict(source=source), code="""
         var cmaps = %s;
         var data = source.get('data');
-        console.log(cb_data)
-        console.log(cb_obj)
         var cm_chosen = cb_obj.get('action');
-        console.log(cm_chosen);
-        
         data['colors'] = cmaps[cm_chosen];
         source.trigger('change');
     """%( ast.literal_eval(json.dumps( { c: get_colors(c)  for c in all_color_maps } ))) )
-    
+
     menu = [(c,c) for c in all_color_maps]
-    dropdown = Dropdown(label="Change colormap", type="success", 
-                        default_action='rainbow', menu=menu, callback=callback)   
-    
+    dropdown = Dropdown(label="Change colormap", type="primary",
+                        default_action='rainbow', menu=menu, callback=callback)
+
     layout = vform(dropdown, p)
     return layout
