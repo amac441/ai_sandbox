@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block content %}
 <div class="container-fluid">
@@ -15,5 +16,8 @@
           <li class="list-group-item"><a class="btn btn-info" href="{% url 'plot1:ex5' %} ">Plot 1 Ex. 5 (2D scatter with color map dropdown selection)</a></li>
         </ul>
     </div>
+</div>
+<div class="container-fluid">
+  <img src="{% static "bokeh-transparent.png" %}" class="img-circle" alt="Bokeh" >
 </div>
 {% endblock content %}
