@@ -24,3 +24,10 @@ Open the browser: [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
 with:
 - Django 1.8
 - Bokeh 0.9.1
+
+# Instalation:
+```
+virtualenv env
+pip install -r requirements.txt
+
+```
