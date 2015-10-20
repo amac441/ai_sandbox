@@ -160,7 +160,7 @@ def plot5():
 
     menu = [(c,c) for c in all_color_maps]
     dropdown = Dropdown(label="Change colormap", type="primary",
-                        default_action='rainbow', menu=menu, callback=callback)
+                        default_value='rainbow', menu=menu, callback=callback)
 
     layout = vform(dropdown, p)
     return layout

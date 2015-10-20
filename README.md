@@ -22,14 +22,15 @@ Open the browser: [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
 
 # Tested:
 with:
-- Django 1.8
-- Bokeh 0.9.1
+- Django 1.8.5
+- Bokeh 0.10
 
 # Instalation:
 ```
 virtualenv env
 pip install -r requirements.txt
-
+source env/bin/activate
+ python site1/manage.py runserver 8001
 ```
 
 # Deployment
