@@ -1,6 +1,0 @@
-django
-bokeh==0.9.3
-matplotlib
-pandas==0.17
-numpy
-

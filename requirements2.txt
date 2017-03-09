@@ -1,0 +1,10 @@
+bokeh==0.9.3
+Django==1.8.5
+matplotlib
+netCDF4
+numpy
+oauth2==1.5.211
+pandas==0.19.2
+path.py==0.0.0
+requests==2.13.0
+scandir==1.4
